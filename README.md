@@ -2,7 +2,9 @@
 
 60 秒内按顾客的热量、预算、口味配餐的小游戏。纯静态，双击 `index.html` 就能玩。
 
-**在线玩：https://binge-666.github.io/fandian-game/**（手机浏览器直接打开，打完可发战书和好友 PK）
+**在线玩**（手机浏览器直接打开，打完可发战书和好友 PK）：
+
+https://binge-666.github.io/fandian-game/
 
 - 1 个主食 + 1 杯饮料，最多 4 件
 - 总价不能超预算；口味要匹配
