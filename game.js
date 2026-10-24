@@ -810,11 +810,14 @@
 
   async function shareScore() {
     const base = shareBaseUrl();
-    const url = base ? base + "?pk=" + state.score : "";
+    const hasScore = state.score > 0;
+    const url = base && hasScore ? base + "?pk=" + state.score : "";
     const text =
-      "我在《饭点大作战》今日同题挑战拿了 " + state.score + " 分，成功出餐 " +
-      state.served + " 单，最高连击 x" + Math.max(1, state.bestCombo) +
-      "。" + (url ? "点链接跟我 PK！" : "你能超过我吗？");
+      "我在《饭点大作战》今日同题挑战" +
+      (hasScore
+        ? "拿了 " + state.score + " 分，成功出餐 " + state.served +
+          " 单，最高连击 x" + Math.max(1, state.bestCombo) + "。点链接跟我 PK！"
+        : "开了个头，你能超过我吗？");
 
     /* 系统分享只在触屏/手机上用；电脑上系统分享面板体验差且常发不出去，直接复制 */
     const isTouch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
