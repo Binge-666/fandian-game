@@ -47,6 +47,8 @@
     patienceFill: $("patienceFill"),
     chefBubble: $("chefBubble"),
     pkBanner: $("pkBanner"),
+    pkBannerText: $("pkBannerText"),
+    pkCloseBtn: $("pkCloseBtn"),
     pkStartBtn: $("pkStartBtn"),
     overHint: $("overHint"),
     overTitle: $("overTitle"),
@@ -219,8 +221,21 @@
   function updatePkBanner() {
     if (!pkTarget) return;
     els.pkBanner.hidden = false;
-    els.pkBanner.textContent = "⚔️ 好友下了战书：" + pkTarget + " 分，敢应吗？";
+    els.pkBannerText.textContent = "⚔️ 好友下了战书：" + pkTarget + " 分，敢应吗？";
     els.shareBtn.textContent = "反击回去";
+  }
+
+  function dismissPk() {
+    pkTarget = 0;
+    try {
+      localStorage.removeItem(PK_KEY);
+    } catch (error) {
+      // 存储不可用时仅隐藏本次横幅。
+    }
+    els.pkBanner.hidden = true;
+    els.shareBtn.textContent = "挑战好友";
+    showToast("战书已关闭", "warn");
+    beep(300, 0.05, "sine", 0.03);
   }
 
   function readMuted() {
@@ -975,6 +990,7 @@
     els.againBtn.addEventListener("click", startGame);
     els.shareBtn.addEventListener("click", shareScore);
     els.pkStartBtn.addEventListener("click", shareBest);
+    els.pkCloseBtn.addEventListener("click", dismissPk);
     els.muteBtn.addEventListener("click", () => {
       applyMuted(!state.muted);
       writeMuted(state.muted);

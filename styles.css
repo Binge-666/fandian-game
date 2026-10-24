@@ -300,14 +300,42 @@ button:focus-visible {
 }
 
 .pk-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin: 12px 0 0;
-  padding: 9px 14px;
+  padding: 9px 12px 9px 14px;
   border: 1.5px dashed var(--red);
   border-radius: 12px;
   background: #fff0e8;
   color: var(--red-dark);
   font-size: 13px;
   font-weight: 900;
+}
+
+.pk-line[hidden] {
+  display: none !important;
+}
+
+.pk-close {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(217, 37, 29, 0.12);
+  color: var(--red-dark);
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.pk-close:hover {
+  background: rgba(217, 37, 29, 0.24);
 }
 
 .source {

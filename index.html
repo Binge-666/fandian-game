@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#d9251d">
   <meta name="description" content="饭点大作战：60 秒内按热量、预算和口味配餐的小游戏。菜单与营养数据来自麦当劳 MCP 快照。">
   <title>饭点大作战 · 60 秒配餐挑战</title>
-  <link rel="stylesheet" href="styles.css?v=20261024d">
+  <link rel="stylesheet" href="styles.css?v=20261024e">
 </head>
 <body>
   <button class="sound-btn" id="muteBtn" type="button" aria-pressed="false" aria-label="关闭音效">🔊</button>
@@ -47,7 +47,10 @@
 
           <p class="hint">点选单品 → 看合计 → 出餐。客人有耐心条，手快有奖；3 颗心用完结束。</p>
           <p class="best-line">今日最高：<strong id="startBest">0</strong> 分</p>
-          <p class="pk-line" id="pkBanner" hidden></p>
+          <p class="pk-line" id="pkBanner" hidden>
+            <span id="pkBannerText"></span>
+            <button class="pk-close" id="pkCloseBtn" type="button" aria-label="关闭战书">✕</button>
+          </p>
           <p class="source" id="sourceNote">菜单数据来自麦当劳 MCP 快照</p>
         </div>
 
@@ -170,6 +173,6 @@
 
   <script src="game-data.js?v=20261024b"></script>
   <script src="game-art.js?v=20261024b"></script>
-  <script src="game.js?v=20261024l"></script>
+  <script src="game.js?v=20261024m"></script>
 </body>
 </html>
