@@ -244,6 +244,11 @@
     els.muteBtn.textContent = value ? "🔇" : "🔊";
     els.muteBtn.setAttribute("aria-pressed", String(value));
     els.muteBtn.setAttribute("aria-label", value ? "打开音效" : "关闭音效");
+    if (value) {
+      stopBgm();
+    } else if (state.phase === "playing") {
+      startBgm();
+    }
   }
 
   function beep(frequency, duration, type, gain) {
@@ -287,6 +292,78 @@
 
   function playFail() {
     beep(150, 0.22, "sawtooth", 0.05);
+  }
+
+  /* ---------- 背景音乐：Web Audio 合成的轻快循环，无外部文件 ---------- */
+  let bgmTimerId = 0;
+  let bgmStep = 0;
+  let bgmNextTime = 0;
+  const BGM_TEMPO = 138;               // BPM
+  const BGM_STEP = 60 / BGM_TEMPO / 2; // 八分音符时长
+  const BGM_MELODY = [
+    523.25, 659.25, 783.99, 659.25, 880, 783.99, 659.25, 587.33,
+    523.25, 659.25, 783.99, 880, 1046.5, 880, 783.99, 0,
+    523.25, 659.25, 783.99, 659.25, 880, 783.99, 659.25, 587.33,
+    880, 783.99, 659.25, 783.99, 659.25, 587.33, 523.25, 0
+  ];
+  const BGM_BASS = [
+    130.81, 0, 196, 0, 220, 0, 196, 0,
+    174.61, 0, 130.81, 0, 220, 0, 196, 0,
+    130.81, 0, 196, 0, 220, 0, 196, 0,
+    174.61, 0, 130.81, 0, 196, 0, 130.81, 0
+  ];
+
+  function bgmNote(freq, when, dur, type, level) {
+    try {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const vol = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      vol.gain.setValueAtTime(level, when);
+      vol.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+      osc.connect(vol);
+      vol.connect(audioCtx.destination);
+      osc.start(when);
+      osc.stop(when + dur);
+    } catch (error) {
+      // 合成失败不影响游戏。
+    }
+  }
+
+  function startBgm() {
+    stopBgm();
+    if (state.muted) return;
+    if (!audioCtx) {
+      const activation = navigator.userActivation;
+      if (activation && !activation.isActive) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      audioCtx = new AudioContextClass();
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    bgmStep = 0;
+    bgmNextTime = audioCtx.currentTime + 0.08;
+    bgmTimerId = window.setInterval(() => {
+      if (state.muted || state.phase !== "playing" || !audioCtx) {
+        stopBgm();
+        return;
+      }
+      const rate = state.remaining <= 10000 ? 1.18 : 1;
+      const stepDur = BGM_STEP / rate;
+      while (bgmNextTime < audioCtx.currentTime + 0.25) {
+        const idx = bgmStep % BGM_MELODY.length;
+        if (BGM_MELODY[idx]) bgmNote(BGM_MELODY[idx], bgmNextTime, stepDur * 0.92, "square", 0.016);
+        if (BGM_BASS[idx]) bgmNote(BGM_BASS[idx], bgmNextTime, stepDur * 1.7, "triangle", 0.028);
+        bgmNextTime += stepDur;
+        bgmStep += 1;
+      }
+    }, 100);
+  }
+
+  function stopBgm() {
+    window.clearInterval(bgmTimerId);
+    bgmTimerId = 0;
   }
 
   function renderMenu() {
@@ -626,6 +703,7 @@
   function clearTimers() {
     window.clearInterval(state.timerId);
     window.clearTimeout(state.nextTimeout);
+    stopBgm();
     state.timerId = 0;
     state.nextTimeout = 0;
   }
@@ -665,6 +743,7 @@
     nextOrder();
     startTimer();
     beep(520, 0.08, "triangle", 0.045);
+    startBgm();
   }
 
   function endGame(reason) {
