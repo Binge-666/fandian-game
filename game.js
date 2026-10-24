@@ -816,7 +816,10 @@
       state.served + " 单，最高连击 x" + Math.max(1, state.bestCombo) +
       "。" + (url ? "点链接跟我 PK！" : "你能超过我吗？");
 
-    if (navigator.share && url) {
+    /* 系统分享只在触屏/手机上用；电脑上系统分享面板体验差且常发不出去，直接复制 */
+    const isTouch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const isMobileUA = /Android|iPhone|iPad|Mobi/i.test(navigator.userAgent);
+    if ((isTouch || isMobileUA) && navigator.share && url) {
       try {
         await navigator.share({ title: "饭点大作战", text: text, url: url });
         return;
