@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d9251d">
+  <meta name="description" content="饭点大作战：60 秒内按热量、预算和口味配餐的小游戏。菜单与营养数据来自麦当劳 MCP 快照。">
+  <title>饭点大作战 · 60 秒配餐挑战</title>
+  <link rel="stylesheet" href="styles.css?v=20261024d">
+</head>
+<body>
+  <button class="sound-btn" id="muteBtn" type="button" aria-pressed="false" aria-label="关闭音效">🔊</button>
+
+  <div class="app">
+    <header class="hud" id="hud" hidden>
+      <div class="hud__brand">饭点大作战</div>
+      <div class="hud__stat">
+        <span>得分</span>
+        <strong id="score">0</strong>
+      </div>
+      <div class="hud__stat">
+        <span>连击</span>
+        <strong id="combo">x1</strong>
+      </div>
+      <div class="hud__stat hud__stat--timer" id="timerBox">
+        <span>时间</span>
+        <strong id="timer">60</strong>
+      </div>
+      <div class="hud__hearts" id="hearts" aria-label="剩余机会"></div>
+    </header>
+
+    <main class="stage">
+      <section class="screen screen--start" id="startScreen">
+        <div class="start-card">
+          <p class="eyebrow" id="todayLabel">今日挑战</p>
+          <h1>饭点<br><em>大作战</em></h1>
+          <p class="lede">顾客只给三个数：热量、预算、口味。<br>60 秒内配出一份能过关的餐。</p>
+
+          <div class="rules" aria-label="配餐规则">
+            <span>1 主食</span>
+            <span>1 饮料</span>
+            <span>最多 4 件</span>
+          </div>
+
+          <button class="btn btn--primary btn--start" id="startBtn" type="button">开始 60 秒</button>
+          <button class="btn btn--ghost btn--pk" id="pkStartBtn" type="button">⚔️ 挑战好友 · 发战绩链接</button>
+
+          <p class="hint">点选单品 → 看合计 → 出餐。客人有耐心条，手快有奖；3 颗心用完结束。</p>
+          <p class="best-line">今日最高：<strong id="startBest">0</strong> 分</p>
+          <p class="pk-line" id="pkBanner" hidden></p>
+          <p class="source" id="sourceNote">菜单数据来自麦当劳 MCP 快照</p>
+        </div>
+
+        <div class="start-art" aria-hidden="true">
+          <div class="float float--1" data-art="4810"></div>
+          <div class="float float--2" data-art="9900008751"></div>
+          <div class="float float--3" data-art="1406"></div>
+          <div class="float float--4" data-art="515837"></div>
+          <div class="start-art__plate"></div>
+          <div class="start-art__chef chef-art"></div>
+        </div>
+      </section>
+
+      <section class="screen screen--game" id="gameScreen" hidden>
+        <article class="order" id="orderCard" aria-live="polite">
+          <div class="customer">
+            <div class="customer__face" id="customerFace">🧑‍💻</div>
+            <div>
+              <p class="customer__label">当前顾客</p>
+              <h2 id="customerName">加班的小李</h2>
+            </div>
+          </div>
+
+          <div class="demands">
+            <div class="demand">
+              <span>热量</span>
+              <strong id="targetKcal">700</strong>
+              <small>kcal</small>
+            </div>
+            <div class="demand">
+              <span>预算</span>
+              <strong id="budget">40</strong>
+              <small>元</small>
+            </div>
+            <div class="demand demand--taste" id="tasteDemand">
+              <span>口味</span>
+              <strong id="taste">要辣</strong>
+            </div>
+          </div>
+
+          <p class="order__speech" id="speech">“赶时间，给我来一份辣的。”</p>
+          <div class="order__patience" id="patienceTrack" aria-hidden="true"><span id="patienceFill"></span></div>
+          <div class="order__chef">
+            <div class="chef-art" aria-hidden="true"></div>
+            <div class="order__chef-bubble" id="chefBubble" aria-hidden="true"></div>
+          </div>
+        </article>
+
+        <div class="menu-grid" id="menuGrid"></div>
+
+        <div class="tray">
+          <div class="tray__totals">
+            <div>
+              <span>已选</span>
+              <strong id="pickedCount">0</strong>
+              <small>件</small>
+            </div>
+            <div>
+              <span>热量</span>
+              <strong id="totalKcal">0</strong>
+              <small>kcal</small>
+            </div>
+            <div>
+              <span>总价</span>
+              <strong id="totalPrice">0</strong>
+              <small>元</small>
+            </div>
+          </div>
+          <div class="tray__actions">
+            <button class="btn btn--ghost" id="clearBtn" type="button">清空</button>
+            <button class="btn btn--primary" id="serveBtn" type="button">出餐</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen screen--over" id="overScreen" hidden>
+        <div class="over-card">
+          <div class="over-card__chef chef-art" aria-hidden="true"></div>
+          <p class="eyebrow">本局结束</p>
+          <h2 id="overTitle">饭点收摊</h2>
+          <div class="final-score">
+            <strong id="finalScore">0</strong>
+            <span>分</span>
+          </div>
+          <p class="final-stars" id="finalStars" aria-hidden="true"></p>
+
+          <div class="final-stats">
+            <div>
+              <span>成功出餐</span>
+              <strong id="finalServed">0</strong>
+            </div>
+            <div>
+              <span>最高连击</span>
+              <strong id="finalCombo">x1</strong>
+            </div>
+            <div>
+              <span>今日最高</span>
+              <strong id="finalBest">0</strong>
+            </div>
+          </div>
+
+          <p class="over-line" id="overLine">手速不错，再配一单？</p>
+
+          <div class="over-actions">
+            <button class="btn btn--primary" id="againBtn" type="button">再来一局</button>
+            <button class="btn btn--ghost" id="shareBtn" type="button">挑战好友</button>
+          </div>
+          <p class="hint" id="overHint">挑战链接带你的成绩，朋友打开就能跟你同题 PK。</p>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="result-pop" id="resultPop" aria-hidden="true"></div>
+    </main>
+  </div>
+
+  <noscript>
+    <p class="noscript">需要开启 JavaScript 才能玩《饭点大作战》。</p>
+  </noscript>
+
+  <script src="game-data.js?v=20261024b"></script>
+  <script src="game-art.js?v=20261024b"></script>
+  <script src="game.js?v=20261024j"></script>
+</body>
+</html>
